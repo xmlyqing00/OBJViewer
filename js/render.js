@@ -102,6 +102,7 @@ function showOBJ(data) {
     var loader = new THREE.OBJLoader();
     mesh = loader.parse(data).children[0];
     mesh.geometry.translate(-xCenter, -yCenter, -zCenter);
+    mesh.material.side = THREE.DoubleSide;
     scene.add(mesh);
 
     animate();
