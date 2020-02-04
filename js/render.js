@@ -1,15 +1,10 @@
 var objPath = './Leonardo.obj';
-var scale = 4;
+var scale = 2.5;
 var INF = 100000000;
-
-var container;
 
 var camera, scene, renderer, controls, animationId;
 
 var mouseX = 0, mouseY = 0;
-
-var windowHalfX = window.innerWidth / 2;
-var windowHalfY = window.innerHeight / 2;
 
 var xCenter, yCenter, zCenter, zOffset;
 
@@ -21,21 +16,29 @@ $(document).ready(function () {
 
 function initScene() {
 
-    container = $("#container")[0];
+    var container = $("#container")[0];
 
     camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000);
     camera.position.x = 0;
     camera.position.y = 0;
-    camera.position.z = zOffset;
+    camera.position.z = -zOffset;
 
+    // cameraQuaternion = new THREE.Quaternion();
+    // cameraQuaternion.set(1, 0, 0, 1);
+    // camera.quaternion.multiply(cameraQuaternion);
+    // camera.rotation.setFromQuaternion(camera.quaternion, camera.rotation.order);
+    // camera.rotation.x = 1;
+    // camera.updateProjectionMatrix();
+
+    
     // scene
 
     scene = new THREE.Scene();
 
-    var ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+    var ambientLight = new THREE.AmbientLight(0xcccccc, 0.3);
     scene.add(ambientLight);
 
-    var pointLight = new THREE.PointLight(0xffffff, 0.7);
+    var pointLight = new THREE.PointLight(0xeeeeee, 0.6);
     camera.add(pointLight);
     scene.add(camera);
 
@@ -48,11 +51,11 @@ function initScene() {
     // document.addEventListener('mousemove', onDocumentMouseMove, false);
     window.addEventListener('resize', onWindowResize, false);
 
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.25;
-    // controls.maxDistance = scale * 8;
-    controls.update();
+    controls = new THREE.TrackballControls(camera, renderer.domElement);
+    controls.dynamicDampingFactor = 0.5;
+    controls.rotateSpeed = 2;
+    controls.zoomSpeed = 2;
+    controls.panSpeed = 3;
 
 }
 
@@ -64,16 +67,15 @@ function clearScene() {
 
 function showOBJ(data) {
 
-    vertexCnt = 0;
-    faceCnt = 0;
-    xMin = INF, yMin = INF, zMin = INF;
-    xMax = -INF, yMax = -INF, zMax = -INF;
+    var vertexCnt = 0, faceCnt = 0;
+    var xMin = INF, yMin = INF, zMin = INF;
+    var xMax = -INF, yMax = -INF, zMax = -INF;
 
-    dataLines = data.split('\n');
+    var dataLines = data.split('\n');
     for (var i = 0; i < dataLines.length; i++) {
         if (dataLines[i][0] == 'v' && dataLines[i][1] == ' ') {
             vertexCnt++;
-            vertexData = dataLines[i].split(' ');
+            var vertexData = dataLines[i].split(' ');
             xMin = Math.min(xMin, vertexData[1]);
             xMax = Math.max(xMax, vertexData[1]);
             yMin = Math.min(yMin, vertexData[2]);
@@ -102,6 +104,7 @@ function showOBJ(data) {
     var loader = new THREE.OBJLoader();
     mesh = loader.parse(data).children[0];
     mesh.geometry.translate(-xCenter, -yCenter, -zCenter);
+    mesh.geometry.rotateZ(Math.PI);
     mesh.material.side = THREE.DoubleSide;
     scene.add(mesh);
 
@@ -179,15 +182,16 @@ function onWindowResize() {
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 
+    controls.handleResize();
+
 }
 
 
 function animate() {
 
     animationId = requestAnimationFrame(animate);
-
+    
     controls.update();
     renderer.render(scene, camera);
-    // render();
 
 }
