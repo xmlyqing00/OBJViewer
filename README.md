@@ -10,6 +10,9 @@ Click `TRY DEFAULT OBJ` or upload your `*.obj` file. Drag mouse or scroll to vie
 
 ![](screenshot.png)
 
+## Documents
+- `index.html`: The main web page displays the rendered results and information.
+- `js/render.js`: This JS contains render routine and button function. In the first line of the  `js/renderer.js`, the variable `objPath` points to the path of the default object file.
 
 ## LICENSE
 MIT
